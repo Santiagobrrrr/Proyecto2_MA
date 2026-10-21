@@ -99,7 +99,9 @@ def agregar_contacto(contacto):
     contacto = {**contacto, "id": identificador}
     registro = empaquetar_contacto(contacto)
     indice = verificar_archivos()
-
+    comprobar_integridad()
+    identificador = validar_id(contacto["id"])
+    
     if str(identificador) in indice:
         raise ValueError("Ya existe un contacto con ese ID.")
 
@@ -123,6 +125,7 @@ def agregar_contacto(contacto):
             raise RuntimeError("No se pudo actualizar el índice ni revertir el archivo.")
         raise
 
+    actualizar_hash()
     return posicion
 
 def buscar_contacto(identificador):
@@ -159,6 +162,8 @@ def buscar_contacto(identificador):
     return contacto, posicion_actual
 
 def modificar_contacto(identificador, nuevos_datos):
+    comprobar_integridad()
+    identificador = validar_id(identificador)
     identificador = validar_id(identificador)
     permitidos = {"nombre", "telefono", "correo", "ciudad"}
 
@@ -178,4 +183,18 @@ def modificar_contacto(identificador, nuevos_datos):
         archivo.seek(posicion)
         archivo.write(registro)
 
+    actualizar_hash()
     return posicion
+
+def actualizar_hash():
+    from app.services.herramientas import guardar_hash
+    guardar_hash()
+
+
+def comprobar_integridad():
+    from app.services.herramientas import verificar_integridad
+
+    estado, mensaje = verificar_integridad()
+
+    if not estado:
+        raise ValueError(mensaje)
