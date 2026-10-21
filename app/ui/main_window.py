@@ -1,17 +1,17 @@
-from PySide6.QtWidgets import QMainWindow, QLabel
-from PySide6.QtCore import Qt
 
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 
 class MainWindow(QMainWindow):
-
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Agenda de Contactos")
-        self.resize(1100, 700)
-        self.setMinimumSize(850, 550)
+        self.resize(1150, 740)
+        self.setMinimumSize(900, 600)
 
-        titulo = QLabel("Agenda de Contactos")
-        titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        contenedor = QWidget()
+        self.layout_principal = QVBoxLayout(contenedor)
+        self.layout_principal.setContentsMargins(0, 0, 0, 0)
+        self.layout_principal.setSpacing(0)
 
-        self.setCentralWidget(titulo)
+        self.setCentralWidget(contenedor)
