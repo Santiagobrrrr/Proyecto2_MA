@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
 )
 from app.services.exportacion import obtener_contactos
 from app.core.agenda import buscar_contacto
+from app.ui.components.contacto_dialog import ContactoDialog
 
 class ContactosPage(QWidget):
     def __init__(self):
@@ -31,10 +32,6 @@ class ContactosPage(QWidget):
 
         self.boton_agregar = QPushButton("+ Nuevo contacto")
         self.boton_agregar.setObjectName("boton_primario")
-        self.boton_agregar.setEnabled(False)
-        self.boton_agregar.setToolTip(
-            "Disponible cuando implementemos el formulario de registro."
-        )
 
         encabezado.addLayout(informacion)
         encabezado.addStretch()
@@ -119,6 +116,7 @@ class ContactosPage(QWidget):
         self.campo_busqueda.returnPressed.connect(self.buscar_por_id)
 
         self.cargar_contactos()
+        self.boton_agregar.clicked.connect(self.abrir_formulario)
 
     def mostrar_contactos(self, contactos):
         campos = ["id", "nombre", "telefono", "correo", "ciudad"]
@@ -199,3 +197,9 @@ class ContactosPage(QWidget):
     def mostrar_todos(self):
         self.campo_busqueda.clear()
         self.cargar_contactos()
+    
+    def abrir_formulario(self):
+        dialogo = ContactoDialog(self)
+
+        if dialogo.exec() == ContactoDialog.DialogCode.Accepted:
+            self.mostrar_todos()

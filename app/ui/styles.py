@@ -237,4 +237,37 @@ QPushButton#boton_secundario:hover {
     background-color: #F1F5F9;
 }
 
+
+QDialog#contacto_dialog {
+    background-color: #FFFFFF;
+}
+
+QLabel#dialog_titulo {
+    color: #17283E;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+QLabel#dialog_descripcion {
+    color: #64748B;
+    font-size: 12px;
+}
+
+QDialog QLineEdit {
+    background-color: #F8FAFC;
+    border: 1px solid #DCE4EC;
+    border-radius: 8px;
+    padding: 11px 12px;
+    color: #243247;
+}
+
+QDialog QLineEdit:focus {
+    border: 1px solid #0F9D92;
+    background-color: #FFFFFF;
+}
+
+QDialog QLabel {
+    color: #334155;
+}
+
 """
