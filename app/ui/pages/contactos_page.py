@@ -1,3 +1,5 @@
+from PySide6.QtWidgets import QTableWidgetItem, QMessageBox
+from app.services.exportacion import obtener_contactos
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout,
@@ -89,3 +91,39 @@ class ContactosPage(QWidget):
 
         contenido.addWidget(self.tabla)
         layout.addWidget(panel, 1)
+        self.cargar_contactos()
+        
+    def cargar_contactos(self):
+        try:
+            contactos = obtener_contactos()
+
+            self.tabla.setRowCount(len(contactos))
+
+            campos = ["id", "nombre", "telefono", "correo", "ciudad"]
+
+            for fila, contacto in enumerate(contactos):
+                for columna, campo in enumerate(campos):
+                    valor = str(contacto[campo])
+                    elemento = QTableWidgetItem(valor)
+
+                    if columna == 0:
+                        elemento.setTextAlignment(
+                            Qt.AlignmentFlag.AlignCenter
+                        )
+
+                    self.tabla.setItem(fila, columna, elemento)
+
+            cantidad = len(contactos)
+            texto = "contacto" if cantidad == 1 else "contactos"
+            self.contador.setText(f"{cantidad} {texto}")
+
+        except (OSError, ValueError) as error:
+            self.tabla.setRowCount(0)
+            self.contador.setText("No disponible")
+
+            QMessageBox.warning(
+                self,
+                "Error al cargar contactos",
+                f"No se pudieron leer los contactos.\n\n{error}"
+            )
+    
