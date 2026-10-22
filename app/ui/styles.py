@@ -196,4 +196,45 @@ QHeaderView::section {
     font-weight: 600;
 }
 
+
+QLineEdit#campo_busqueda {
+    background-color: #F8FAFC;
+    border: 1px solid #DCE4EC;
+    border-radius: 9px;
+    padding: 12px 14px;
+    color: #243247;
+    font-size: 13px;
+}
+
+QLineEdit#campo_busqueda:focus {
+    border: 1px solid #0F9D92;
+    background-color: #FFFFFF;
+}
+
+QPushButton#boton_buscar {
+    background-color: #0F9D92;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 22px;
+    font-weight: 600;
+}
+
+QPushButton#boton_buscar:hover {
+    background-color: #0C847B;
+}
+
+QPushButton#boton_secundario {
+    background-color: #FFFFFF;
+    color: #334155;
+    border: 1px solid #DCE4EC;
+    border-radius: 9px;
+    padding: 12px 18px;
+    font-weight: 600;
+}
+
+QPushButton#boton_secundario:hover {
+    background-color: #F1F5F9;
+}
+
 """

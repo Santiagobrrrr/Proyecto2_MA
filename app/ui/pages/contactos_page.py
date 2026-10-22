@@ -1,10 +1,11 @@
-from PySide6.QtWidgets import QTableWidgetItem, QMessageBox
-from app.services.exportacion import obtener_contactos
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QLabel, QVBoxLayout, QHBoxLayout,
-    QTableWidget, QHeaderView, QPushButton, QFrame
+    QTableWidget, QTableWidgetItem, QHeaderView,
+    QPushButton, QLineEdit, QFrame, QMessageBox
 )
+from app.services.exportacion import obtener_contactos
+from app.core.agenda import buscar_contacto
 
 class ContactosPage(QWidget):
     def __init__(self):
@@ -61,6 +62,27 @@ class ContactosPage(QWidget):
 
         contenido.addLayout(fila_superior)
 
+        busqueda = QHBoxLayout()
+        busqueda.setSpacing(10)
+
+        self.campo_busqueda = QLineEdit()
+        self.campo_busqueda.setObjectName("campo_busqueda")
+        self.campo_busqueda.setPlaceholderText("Buscar contacto por ID...")
+        self.campo_busqueda.setClearButtonEnabled(True)
+        self.campo_busqueda.setMaxLength(7)
+
+        self.boton_buscar = QPushButton("Buscar")
+        self.boton_buscar.setObjectName("boton_buscar")
+
+        self.boton_mostrar = QPushButton("Mostrar todos")
+        self.boton_mostrar.setObjectName("boton_secundario")
+
+        busqueda.addWidget(self.campo_busqueda, 1)
+        busqueda.addWidget(self.boton_buscar)
+        busqueda.addWidget(self.boton_mostrar)
+
+        contenido.addLayout(busqueda)
+
         self.tabla = QTableWidget()
         self.tabla.setColumnCount(5)
         self.tabla.setHorizontalHeaderLabels(
@@ -91,31 +113,41 @@ class ContactosPage(QWidget):
 
         contenido.addWidget(self.tabla)
         layout.addWidget(panel, 1)
+
+        self.boton_buscar.clicked.connect(self.buscar_por_id)
+        self.boton_mostrar.clicked.connect(self.mostrar_todos)
+        self.campo_busqueda.returnPressed.connect(self.buscar_por_id)
+
         self.cargar_contactos()
-        
+
+    def mostrar_contactos(self, contactos):
+        campos = ["id", "nombre", "telefono", "correo", "ciudad"]
+
+        self.tabla.setRowCount(len(contactos))
+
+        for fila, contacto in enumerate(contactos):
+            for columna, campo in enumerate(campos):
+                elemento = QTableWidgetItem(str(contacto[campo]))
+
+                if columna == 0:
+                    elemento.setTextAlignment(
+                        Qt.AlignmentFlag.AlignCenter
+                    )
+
+                self.tabla.setItem(fila, columna, elemento)
+
     def cargar_contactos(self):
         try:
             contactos = obtener_contactos()
-
-            self.tabla.setRowCount(len(contactos))
-
-            campos = ["id", "nombre", "telefono", "correo", "ciudad"]
-
-            for fila, contacto in enumerate(contactos):
-                for columna, campo in enumerate(campos):
-                    valor = str(contacto[campo])
-                    elemento = QTableWidgetItem(valor)
-
-                    if columna == 0:
-                        elemento.setTextAlignment(
-                            Qt.AlignmentFlag.AlignCenter
-                        )
-
-                    self.tabla.setItem(fila, columna, elemento)
+            self.mostrar_contactos(contactos)
 
             cantidad = len(contactos)
             texto = "contacto" if cantidad == 1 else "contactos"
-            self.contador.setText(f"{cantidad} {texto}")
+
+            if cantidad == 0:
+                self.contador.setText("Agenda vacía")
+            else:
+                self.contador.setText(f"{cantidad} {texto}")
 
         except (OSError, ValueError) as error:
             self.tabla.setRowCount(0)
@@ -126,4 +158,44 @@ class ContactosPage(QWidget):
                 "Error al cargar contactos",
                 f"No se pudieron leer los contactos.\n\n{error}"
             )
-    
+
+    def buscar_por_id(self):
+        identificador = self.campo_busqueda.text().strip()
+
+        if not identificador:
+            QMessageBox.information(
+                self,
+                "Buscar contacto",
+                "Ingresa el ID del contacto que deseas buscar."
+            )
+            self.campo_busqueda.setFocus()
+            return
+
+        try:
+            resultado = buscar_contacto(identificador)
+
+            if resultado is None:
+                self.mostrar_contactos([])
+                self.contador.setText("Sin resultados")
+
+                QMessageBox.information(
+                    self,
+                    "Contacto no encontrado",
+                    f"No existe un contacto con el ID {identificador}."
+                )
+                return
+
+            contacto, posicion = resultado
+            self.mostrar_contactos([contacto])
+            self.contador.setText("1 resultado")
+
+        except (OSError, ValueError) as error:
+            QMessageBox.warning(
+                self,
+                "Error de búsqueda",
+                str(error)
+            )
+
+    def mostrar_todos(self):
+        self.campo_busqueda.clear()
+        self.cargar_contactos()
