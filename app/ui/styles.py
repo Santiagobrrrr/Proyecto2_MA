@@ -130,4 +130,15 @@ QLabel#sidebar_version {
 }
 
 
+QLabel#pagina_titulo {
+    color: #17283E;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+QLabel#pagina_descripcion {
+    color: #64748B;
+    font-size: 13px;
+}
+
 """

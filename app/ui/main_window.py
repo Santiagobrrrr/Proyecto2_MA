@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
+    QMainWindow, QWidget, QVBoxLayout,
+    QHBoxLayout, QStackedWidget
 )
 from app.ui.components.header import Header
 from app.ui.components.sidebar import Sidebar
+from app.ui.components.page import Page
 from app.ui.styles import ESTILOS
 
 class MainWindow(QMainWindow):
@@ -29,8 +31,24 @@ class MainWindow(QMainWindow):
 
         self.encabezado = Header()
         layout_contenido.addWidget(self.encabezado)
-        layout_contenido.addStretch()
 
+        self.paginas = QStackedWidget()
+
+        secciones = [
+            ("Contactos", "Consulta y administra tus contactos."),
+            ("Exportar", "Genera archivos JSON y reportes PDF."),
+            ("Herramientas", "Verifica la integridad y crea respaldos."),
+            ("Ayuda", "Información sobre el funcionamiento de la aplicación.")
+        ]
+
+        for titulo, descripcion in secciones:
+            self.paginas.addWidget(Page(titulo, descripcion))
+
+        layout_contenido.addWidget(self.paginas, 1)
         layout_general.addWidget(contenido, 1)
 
         self.setCentralWidget(contenedor)
+
+        self.sidebar.pagina_seleccionada.connect(
+            self.paginas.setCurrentIndex
+        )
