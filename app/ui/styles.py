@@ -141,4 +141,59 @@ QLabel#pagina_descripcion {
     font-size: 13px;
 }
 
+
+QFrame#panel_contactos {
+    background-color: #FFFFFF;
+    border: 1px solid #E5EAF0;
+    border-radius: 14px;
+}
+
+QLabel#panel_titulo {
+    color: #17283E;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+QPushButton#boton_primario {
+    background-color: #0F9D92;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 20px;
+    font-weight: 600;
+}
+
+QPushButton#boton_primario:hover {
+    background-color: #0C847B;
+}
+
+QPushButton#boton_primario:disabled {
+    background-color: #A8D8D2;
+    color: #F5FFFD;
+}
+
+QTableWidget {
+    background-color: #FFFFFF;
+    alternate-background-color: #F8FAFC;
+    border: 1px solid #E5EAF0;
+    border-radius: 9px;
+    selection-background-color: #E4F5F1;
+    selection-color: #17283E;
+    outline: none;
+}
+
+QTableWidget::item {
+    padding: 8px;
+    border-bottom: 1px solid #EDF1F5;
+}
+
+QHeaderView::section {
+    background-color: #F1F5F9;
+    color: #475569;
+    padding: 12px 10px;
+    border: none;
+    border-bottom: 1px solid #E5EAF0;
+    font-weight: 600;
+}
+
 """

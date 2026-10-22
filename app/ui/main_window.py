@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout,
     QHBoxLayout, QStackedWidget
 )
+from app.ui.pages.contactos_page import ContactosPage
 from app.ui.components.header import Header
 from app.ui.components.sidebar import Sidebar
 from app.ui.components.page import Page
@@ -41,7 +42,9 @@ class MainWindow(QMainWindow):
             ("Ayuda", "Información sobre el funcionamiento de la aplicación.")
         ]
 
-        for titulo, descripcion in secciones:
+        self.paginas.addWidget(ContactosPage())
+
+        for titulo, descripcion in secciones[1:]:
             self.paginas.addWidget(Page(titulo, descripcion))
 
         layout_contenido.addWidget(self.paginas, 1)
