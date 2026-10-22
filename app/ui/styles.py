@@ -88,4 +88,46 @@ QLabel#estado {
     font-size: 11px;
     font-weight: 600;
 }
+
+QFrame#sidebar {
+    background-color: #17283E;
+    border: none;
+}
+
+QLabel#sidebar_seccion {
+    color: #91A5BC;
+    font-size: 11px;
+    font-weight: 600;
+    padding-left: 12px;
+}
+
+QPushButton#sidebar_boton {
+    background-color: transparent;
+    color: #C9D5E3;
+    border: none;
+    border-radius: 9px;
+    padding: 15px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QPushButton#sidebar_boton:hover {
+    background-color: #263D56;
+    color: #FFFFFF;
+}
+
+QPushButton#sidebar_boton:checked {
+    background-color: #245768;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+QLabel#sidebar_version {
+    color: #91A5BC;
+    font-size: 11px;
+    padding-left: 12px;
+}
+
+
 """

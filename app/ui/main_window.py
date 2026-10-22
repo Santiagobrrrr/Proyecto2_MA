@@ -1,5 +1,8 @@
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+from PySide6.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
+)
 from app.ui.components.header import Header
+from app.ui.components.sidebar import Sidebar
 from app.ui.styles import ESTILOS
 
 class MainWindow(QMainWindow):
@@ -12,12 +15,22 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(ESTILOS)
 
         contenedor = QWidget()
-        self.layout_principal = QVBoxLayout(contenedor)
-        self.layout_principal.setContentsMargins(0, 0, 0, 0)
-        self.layout_principal.setSpacing(0)
+        layout_general = QHBoxLayout(contenedor)
+        layout_general.setContentsMargins(0, 0, 0, 0)
+        layout_general.setSpacing(0)
+
+        self.sidebar = Sidebar()
+        layout_general.addWidget(self.sidebar)
+
+        contenido = QWidget()
+        layout_contenido = QVBoxLayout(contenido)
+        layout_contenido.setContentsMargins(0, 0, 0, 0)
+        layout_contenido.setSpacing(0)
 
         self.encabezado = Header()
-        self.layout_principal.addWidget(self.encabezado)
-        self.layout_principal.addStretch()
+        layout_contenido.addWidget(self.encabezado)
+        layout_contenido.addStretch()
+
+        layout_general.addWidget(contenido, 1)
 
         self.setCentralWidget(contenedor)
