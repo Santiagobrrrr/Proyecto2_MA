@@ -1,8 +1,11 @@
-
 import json
 import os
 from pathlib import Path
-from app.core.registros import TAMANIO_REGISTRO, empaquetar_contacto, desempaquetar_contacto
+from app.core.registros import (
+    TAMANIO_REGISTRO,
+    empaquetar_contacto,
+    desempaquetar_contacto
+)
 
 CARPETA = Path("datos")
 ARCHIVO = CARPETA / "contactos.dat"
@@ -31,11 +34,13 @@ def cargar_indice():
     if not INDICE.exists():
         if ARCHIVO.exists() and ARCHIVO.stat().st_size > 0:
             raise ValueError("Falta el índice de contactos.")
+
         return {}
 
     try:
         with open(INDICE, "r", encoding="utf-8") as archivo:
             indice = json.load(archivo)
+
     except (json.JSONDecodeError, UnicodeError):
         raise ValueError("El índice JSON está corrupto.")
 
@@ -58,7 +63,12 @@ def guardar_indice(indice):
     temporal = INDICE.with_suffix(".tmp")
 
     with open(temporal, "w", encoding="utf-8") as archivo:
-        json.dump(indice, archivo, indent=4, ensure_ascii=False)
+        json.dump(
+            indice,
+            archivo,
+            indent=4,
+            ensure_ascii=False
+        )
 
     os.replace(temporal, INDICE)
 
@@ -68,6 +78,7 @@ def verificar_archivos():
     if not ARCHIVO.exists():
         if indice:
             raise ValueError("Falta el archivo de contactos.")
+
         return indice
 
     tamanio = ARCHIVO.stat().st_size
@@ -78,7 +89,9 @@ def verificar_archivos():
     cantidad = tamanio // TAMANIO_REGISTRO
 
     if len(indice) != cantidad:
-        raise ValueError("La cantidad de registros no coincide con el índice.")
+        raise ValueError(
+            "La cantidad de registros no coincide con el índice."
+        )
 
     if set(indice.values()) != set(range(cantidad)):
         raise ValueError("El índice contiene posiciones incorrectas.")
@@ -86,22 +99,30 @@ def verificar_archivos():
     with open(ARCHIVO, "rb") as archivo:
         for clave, numero in indice.items():
             archivo.seek(numero * TAMANIO_REGISTRO)
+
             registro = archivo.read(TAMANIO_REGISTRO)
             contacto = desempaquetar_contacto(registro)
 
             if contacto["id"] != int(clave):
-                raise ValueError("El índice no coincide con los contactos.")
+                raise ValueError(
+                    "El índice no coincide con los contactos."
+                )
 
     return indice
 
 def agregar_contacto(contacto):
     identificador = validar_id(contacto["id"])
-    contacto = {**contacto, "id": identificador}
+
+    contacto = {
+        **contacto,
+        "id": identificador
+    }
+
     registro = empaquetar_contacto(contacto)
-    indice = verificar_archivos()
+
     comprobar_integridad()
-    identificador = validar_id(contacto["id"])
-    
+    indice = verificar_archivos()
+
     if str(identificador) in indice:
         raise ValueError("Ya existe un contacto con ese ID.")
 
@@ -117,20 +138,29 @@ def agregar_contacto(contacto):
 
     try:
         guardar_indice(indice)
+
     except OSError:
         try:
             with open(ARCHIVO, "r+b") as archivo:
                 archivo.truncate(posicion)
+                archivo.flush()
+                os.fsync(archivo.fileno())
+
         except OSError:
-            raise RuntimeError("No se pudo actualizar el índice ni revertir el archivo.")
+            raise RuntimeError(
+                "No se pudo actualizar el índice ni revertir el archivo."
+            )
+
         raise
 
     actualizar_hash()
+
     return posicion
 
 def buscar_contacto(identificador):
     identificador = validar_id(identificador)
     indice = cargar_indice()
+
     clave = str(identificador)
 
     if clave not in indice:
@@ -147,28 +177,41 @@ def buscar_contacto(identificador):
     posicion = indice[clave] * TAMANIO_REGISTRO
 
     if posicion + TAMANIO_REGISTRO > tamanio:
-        raise ValueError("La posición del índice está fuera del archivo.")
+        raise ValueError(
+            "La posición del índice está fuera del archivo."
+        )
 
     with open(ARCHIVO, "rb") as archivo:
         archivo.seek(posicion)
+
         posicion_actual = archivo.tell()
         registro = archivo.read(TAMANIO_REGISTRO)
 
     contacto = desempaquetar_contacto(registro)
 
     if contacto["id"] != identificador:
-        raise ValueError("El índice no coincide con el contacto.")
+        raise ValueError(
+            "El índice no coincide con el contacto."
+        )
 
     return contacto, posicion_actual
 
 def modificar_contacto(identificador, nuevos_datos):
     comprobar_integridad()
+
     identificador = validar_id(identificador)
-    identificador = validar_id(identificador)
-    permitidos = {"nombre", "telefono", "correo", "ciudad"}
+
+    permitidos = {
+        "nombre",
+        "telefono",
+        "correo",
+        "ciudad"
+    }
 
     if not nuevos_datos or not set(nuevos_datos).issubset(permitidos):
-        raise ValueError("Los campos que desea modificar no son válidos.")
+        raise ValueError(
+            "Los campos que desea modificar no son válidos."
+        )
 
     resultado = buscar_contacto(identificador)
 
@@ -176,20 +219,24 @@ def modificar_contacto(identificador, nuevos_datos):
         raise ValueError("El contacto no existe.")
 
     contacto, posicion = resultado
+
     contacto.update(nuevos_datos)
     registro = empaquetar_contacto(contacto)
 
     with open(ARCHIVO, "r+b") as archivo:
         archivo.seek(posicion)
         archivo.write(registro)
+        archivo.flush()
+        os.fsync(archivo.fileno())
 
     actualizar_hash()
+
     return posicion
 
 def actualizar_hash():
     from app.services.herramientas import guardar_hash
-    guardar_hash()
 
+    guardar_hash()
 
 def comprobar_integridad():
     from app.services.herramientas import verificar_integridad

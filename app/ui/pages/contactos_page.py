@@ -17,6 +17,7 @@ class ContactosPage(QWidget):
         layout.setSpacing(20)
 
         encabezado = QHBoxLayout()
+        encabezado.setSpacing(12)
 
         informacion = QVBoxLayout()
         informacion.setSpacing(5)
@@ -32,9 +33,19 @@ class ContactosPage(QWidget):
 
         self.boton_agregar = QPushButton("+ Nuevo contacto")
         self.boton_agregar.setObjectName("boton_primario")
+        self.boton_agregar.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.boton_editar = QPushButton("Editar contacto")
+        self.boton_editar.setObjectName("boton_secundario")
+        self.boton_editar.setEnabled(False)
+        self.boton_editar.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.boton_editar.setToolTip(
+            "Selecciona un contacto de la tabla para editarlo."
+        )
 
         encabezado.addLayout(informacion)
         encabezado.addStretch()
+        encabezado.addWidget(self.boton_editar)
         encabezado.addWidget(self.boton_agregar)
 
         layout.addLayout(encabezado)
@@ -70,9 +81,11 @@ class ContactosPage(QWidget):
 
         self.boton_buscar = QPushButton("Buscar")
         self.boton_buscar.setObjectName("boton_buscar")
+        self.boton_buscar.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.boton_mostrar = QPushButton("Mostrar todos")
         self.boton_mostrar.setObjectName("boton_secundario")
+        self.boton_mostrar.setCursor(Qt.CursorShape.PointingHandCursor)
 
         busqueda.addWidget(self.campo_busqueda, 1)
         busqueda.addWidget(self.boton_buscar)
@@ -97,6 +110,7 @@ class ContactosPage(QWidget):
         )
         self.tabla.setAlternatingRowColors(True)
         self.tabla.setShowGrid(False)
+
         self.tabla.verticalHeader().setVisible(False)
         self.tabla.verticalHeader().setDefaultSectionSize(48)
 
@@ -115,12 +129,22 @@ class ContactosPage(QWidget):
         self.boton_mostrar.clicked.connect(self.mostrar_todos)
         self.campo_busqueda.returnPressed.connect(self.buscar_por_id)
 
-        self.cargar_contactos()
         self.boton_agregar.clicked.connect(self.abrir_formulario)
+        self.boton_editar.clicked.connect(self.editar_contacto)
+
+        self.tabla.itemSelectionChanged.connect(
+            self.actualizar_boton_editar
+        )
+        self.tabla.itemDoubleClicked.connect(
+            self.editar_contacto
+        )
+
+        self.cargar_contactos()
 
     def mostrar_contactos(self, contactos):
         campos = ["id", "nombre", "telefono", "correo", "ciudad"]
 
+        self.tabla.setRowCount(0)
         self.tabla.setRowCount(len(contactos))
 
         for fila, contacto in enumerate(contactos):
@@ -133,6 +157,10 @@ class ContactosPage(QWidget):
                     )
 
                 self.tabla.setItem(fila, columna, elemento)
+
+        self.tabla.clearSelection()
+        self.tabla.setCurrentCell(-1, -1)
+        self.actualizar_boton_editar()
 
     def cargar_contactos(self):
         try:
@@ -148,7 +176,7 @@ class ContactosPage(QWidget):
                 self.contador.setText(f"{cantidad} {texto}")
 
         except (OSError, ValueError) as error:
-            self.tabla.setRowCount(0)
+            self.mostrar_contactos([])
             self.contador.setText("No disponible")
 
             QMessageBox.warning(
@@ -166,6 +194,7 @@ class ContactosPage(QWidget):
                 "Buscar contacto",
                 "Ingresa el ID del contacto que deseas buscar."
             )
+
             self.campo_busqueda.setFocus()
             return
 
@@ -184,6 +213,7 @@ class ContactosPage(QWidget):
                 return
 
             contacto, posicion = resultado
+
             self.mostrar_contactos([contacto])
             self.contador.setText("1 resultado")
 
@@ -197,9 +227,59 @@ class ContactosPage(QWidget):
     def mostrar_todos(self):
         self.campo_busqueda.clear()
         self.cargar_contactos()
-    
+
     def abrir_formulario(self):
         dialogo = ContactoDialog(self)
 
         if dialogo.exec() == ContactoDialog.DialogCode.Accepted:
             self.mostrar_todos()
+
+    def actualizar_boton_editar(self):
+        filas = self.tabla.selectionModel().selectedRows()
+        seleccionado = len(filas) == 1
+
+        self.boton_editar.setEnabled(seleccionado)
+
+    def editar_contacto(self, elemento=None):
+        filas = self.tabla.selectionModel().selectedRows()
+
+        if not filas:
+            return
+
+        fila = filas[0].row()
+        elemento_id = self.tabla.item(fila, 0)
+
+        if elemento_id is None:
+            return
+
+        identificador = elemento_id.text()
+
+        try:
+            resultado = buscar_contacto(identificador)
+
+            if resultado is None:
+                QMessageBox.warning(
+                    self,
+                    "Contacto no encontrado",
+                    "El contacto seleccionado ya no existe."
+                )
+
+                self.mostrar_todos()
+                return
+
+            contacto, posicion = resultado
+
+            dialogo = ContactoDialog(
+                self,
+                contacto=contacto
+            )
+
+            if dialogo.exec() == ContactoDialog.DialogCode.Accepted:
+                self.mostrar_todos()
+
+        except (OSError, ValueError) as error:
+            QMessageBox.warning(
+                self,
+                "Error al editar",
+                str(error)
+            )

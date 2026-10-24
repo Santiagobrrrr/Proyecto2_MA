@@ -270,4 +270,22 @@ QDialog QLabel {
     color: #334155;
 }
 
+
+QTableWidget::item:selected {
+    background-color: #DDF3EF;
+    color: #17283E;
+}
+
+QPushButton#boton_secundario:disabled {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    border: 1px solid #E5EAF0;
+}
+
+QDialog QLineEdit:read-only {
+    background-color: #EDF2F7;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
 """

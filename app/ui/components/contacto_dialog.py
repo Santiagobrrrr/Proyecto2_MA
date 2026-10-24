@@ -2,13 +2,18 @@ from PySide6.QtWidgets import (
     QDialog, QLabel, QLineEdit, QPushButton,
     QVBoxLayout, QHBoxLayout, QFormLayout, QMessageBox
 )
-from app.core.agenda import agregar_contacto
+from app.core.agenda import agregar_contacto, modificar_contacto
 
 class ContactoDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, contacto=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Nuevo contacto")
+        self.contacto = contacto
+        self.editando = contacto is not None
+
+        titulo = "Editar contacto" if self.editando else "Nuevo contacto"
+
+        self.setWindowTitle(titulo)
         self.setMinimumWidth(460)
         self.setModal(True)
         self.setObjectName("contacto_dialog")
@@ -17,14 +22,18 @@ class ContactoDialog(QDialog):
         layout.setContentsMargins(30, 28, 30, 28)
         layout.setSpacing(20)
 
-        titulo = QLabel("Nuevo contacto")
-        titulo.setObjectName("dialog_titulo")
+        etiqueta_titulo = QLabel(titulo)
+        etiqueta_titulo.setObjectName("dialog_titulo")
 
-        descripcion = QLabel("Completa la información para registrar un contacto.")
+        descripcion = QLabel(
+            "Actualiza la información del contacto."
+            if self.editando
+            else "Completa la información para registrar un contacto."
+        )
         descripcion.setObjectName("dialog_descripcion")
         descripcion.setWordWrap(True)
 
-        layout.addWidget(titulo)
+        layout.addWidget(etiqueta_titulo)
         layout.addWidget(descripcion)
 
         formulario = QFormLayout()
@@ -58,6 +67,9 @@ class ContactoDialog(QDialog):
 
         layout.addLayout(formulario)
 
+        if self.editando:
+            self.cargar_datos()
+
         botones = QHBoxLayout()
         botones.addStretch()
 
@@ -65,7 +77,9 @@ class ContactoDialog(QDialog):
         boton_cancelar.setObjectName("boton_secundario")
         boton_cancelar.clicked.connect(self.reject)
 
-        boton_guardar = QPushButton("Guardar contacto")
+        boton_guardar = QPushButton(
+            "Guardar cambios" if self.editando else "Guardar contacto"
+        )
         boton_guardar.setObjectName("boton_primario")
         boton_guardar.clicked.connect(self.guardar_contacto)
 
@@ -74,8 +88,20 @@ class ContactoDialog(QDialog):
 
         layout.addLayout(botones)
 
-    def guardar_contacto(self):
-        contacto = {
+    def cargar_datos(self):
+        self.campo_id.setText(str(self.contacto["id"]))
+        self.campo_nombre.setText(self.contacto["nombre"])
+        self.campo_telefono.setText(self.contacto["telefono"])
+        self.campo_correo.setText(self.contacto["correo"])
+        self.campo_ciudad.setText(self.contacto["ciudad"])
+
+        self.campo_id.setReadOnly(True)
+        self.campo_id.setToolTip(
+            "El ID no puede modificarse porque identifica el registro."
+        )
+
+    def obtener_datos(self):
+        return {
             "id": self.campo_id.text().strip(),
             "nombre": self.campo_nombre.text().strip(),
             "telefono": self.campo_telefono.text().strip(),
@@ -83,13 +109,33 @@ class ContactoDialog(QDialog):
             "ciudad": self.campo_ciudad.text().strip()
         }
 
+    def guardar_contacto(self):
+        datos = self.obtener_datos()
+
         try:
-            agregar_contacto(contacto)
+            if self.editando:
+                nuevos_datos = {
+                    "nombre": datos["nombre"],
+                    "telefono": datos["telefono"],
+                    "correo": datos["correo"],
+                    "ciudad": datos["ciudad"]
+                }
+
+                modificar_contacto(
+                    self.contacto["id"],
+                    nuevos_datos
+                )
+
+                mensaje = "Los cambios se guardaron correctamente."
+
+            else:
+                agregar_contacto(datos)
+                mensaje = "El contacto se registró correctamente."
 
             QMessageBox.information(
                 self,
-                "Contacto registrado",
-                "El contacto se guardó correctamente."
+                "Operación completada",
+                mensaje
             )
 
             self.accept()
