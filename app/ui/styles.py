@@ -288,4 +288,44 @@ QDialog QLineEdit:read-only {
     border: 1px solid #E2E8F0;
 }
 
+QPushButton#boton_exportar {
+    background-color: #0F9D92;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 0px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+QPushButton#boton_exportar:hover {
+    background-color: #0C877D;
+}
+
+QPushButton#boton_exportar:pressed {
+    background-color: #096C64;
+}
+
+QPushButton#boton_ver_archivo {
+    background-color: #FFFFFF;
+    color: #17283E;
+    border: 1px solid #DCE4EC;
+    border-radius: 8px;
+    padding: 0px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+QPushButton#boton_ver_archivo:hover {
+    background-color: #F1F5F9;
+    border: 1px solid #0F9D92;
+}
+
+QPushButton#boton_ver_archivo:disabled {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    border: 1px solid #E2E8F0;
+}
 """
