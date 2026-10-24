@@ -6,6 +6,7 @@ from app.ui.pages.contactos_page import ContactosPage
 from app.ui.components.header import Header
 from app.ui.components.sidebar import Sidebar
 from app.ui.components.page import Page
+from app.ui.pages.exportar_page import ExportarPage
 from app.ui.styles import ESTILOS
 
 class MainWindow(QMainWindow):
@@ -44,7 +45,10 @@ class MainWindow(QMainWindow):
 
         self.paginas.addWidget(ContactosPage())
 
-        for titulo, descripcion in secciones[1:]:
+        self.pagina_exportar = ExportarPage()
+        self.paginas.addWidget(self.pagina_exportar)
+
+        for titulo, descripcion in secciones[2:]:
             self.paginas.addWidget(Page(titulo, descripcion))
 
         layout_contenido.addWidget(self.paginas, 1)
@@ -55,3 +59,9 @@ class MainWindow(QMainWindow):
         self.sidebar.pagina_seleccionada.connect(
             self.paginas.setCurrentIndex
         )
+        
+        self.sidebar.pagina_seleccionada.connect(self.actualizar_pagina)
+
+    def actualizar_pagina(self, indice):
+        if indice == 1:
+            self.pagina_exportar.actualizar_contador()   
