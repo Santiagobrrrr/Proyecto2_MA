@@ -28,3 +28,4 @@ class Header(QFrame):
         principal.addLayout(informacion)
         principal.addStretch()
         principal.addWidget(estado)
+        

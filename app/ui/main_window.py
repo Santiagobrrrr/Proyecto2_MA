@@ -7,8 +7,12 @@ from app.ui.components.header import Header
 from app.ui.components.sidebar import Sidebar
 from app.ui.components.page import Page
 from app.ui.pages.exportar_page import ExportarPage
+from app.ui.pages.ayuda_page import AyudaPage
 from app.ui.pages.herramientas_page import HerramientasPage
 from app.ui.styles import ESTILOS
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QMessageBox
+from app.services.herramientas import verificar_integridad
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -52,12 +56,8 @@ class MainWindow(QMainWindow):
         self.pagina_herramientas = HerramientasPage()
         self.paginas.addWidget(self.pagina_herramientas)
 
-        self.paginas.addWidget(
-            Page(
-                "Ayuda",
-                "Información sobre el funcionamiento de la aplicación."
-            )
-        )
+        self.pagina_ayuda = AyudaPage()
+        self.paginas.addWidget(self.pagina_ayuda)
 
         layout_contenido.addWidget(self.paginas, 1)
         layout_general.addWidget(contenido, 1)
@@ -69,7 +69,53 @@ class MainWindow(QMainWindow):
         )
         
         self.sidebar.pagina_seleccionada.connect(self.actualizar_pagina)
+        
+        QTimer.singleShot(0, self.verificar_integridad_inicial)
 
     def actualizar_pagina(self, indice):
         if indice == 1:
             self.pagina_exportar.actualizar_contador()   
+    
+    def verificar_integridad_inicial(self):
+        try:
+            estado, mensaje = verificar_integridad()
+
+            if estado:
+                self.actualizar_estado_sistema(
+                    "● Integridad correcta",
+                    "#0F9D92"
+                )
+            else:
+                self.actualizar_estado_sistema(
+                    "● Integridad comprometida",
+                    "#DC2626"
+                )
+
+                QMessageBox.warning(
+                    self,
+                    "Advertencia de integridad",
+                    "Se detectó un problema de integridad en "
+                    "el archivo de contactos.\n\n"
+                    f"{mensaje}\n\n"
+                    "Las operaciones de registro y modificación "
+                    "están protegidas para evitar nuevas escrituras.\n\n"
+                    "Revisa el archivo o restaura un respaldo válido."
+                )
+
+        except (OSError, ValueError) as error:
+            self.actualizar_estado_sistema(
+                "● Error de verificación",
+                "#DC2626"
+            )
+
+            QMessageBox.critical(
+                self,
+                "Error al verificar integridad",
+                str(error)
+            )
+
+    def actualizar_estado_sistema(self, texto, color):
+        self.encabezado.estado.setText(texto)
+        self.encabezado.estado.setStyleSheet(
+            f"color: {color}; font-weight: 600;"
+        )
