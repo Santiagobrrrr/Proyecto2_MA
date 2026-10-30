@@ -7,6 +7,7 @@ from app.ui.components.header import Header
 from app.ui.components.sidebar import Sidebar
 from app.ui.components.page import Page
 from app.ui.pages.exportar_page import ExportarPage
+from app.ui.pages.herramientas_page import HerramientasPage
 from app.ui.styles import ESTILOS
 
 class MainWindow(QMainWindow):
@@ -48,8 +49,15 @@ class MainWindow(QMainWindow):
         self.pagina_exportar = ExportarPage()
         self.paginas.addWidget(self.pagina_exportar)
 
-        for titulo, descripcion in secciones[2:]:
-            self.paginas.addWidget(Page(titulo, descripcion))
+        self.pagina_herramientas = HerramientasPage()
+        self.paginas.addWidget(self.pagina_herramientas)
+
+        self.paginas.addWidget(
+            Page(
+                "Ayuda",
+                "Información sobre el funcionamiento de la aplicación."
+            )
+        )
 
         layout_contenido.addWidget(self.paginas, 1)
         layout_general.addWidget(contenido, 1)

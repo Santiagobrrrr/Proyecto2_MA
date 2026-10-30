@@ -328,4 +328,32 @@ QPushButton#boton_ver_archivo:disabled {
     color: #94A3B8;
     border: 1px solid #E2E8F0;
 }
+
+QPushButton#boton_herramienta {
+    background-color: #0F9D92;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 0px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 44px;
+}
+
+QPushButton#boton_herramienta:hover {
+    background-color: #0C877D;
+}
+
+QPushButton#boton_herramienta:pressed {
+    background-color: #096C64;
+}
+
+QScrollArea#herramientas_scroll {
+    background: transparent;
+    border: none;
+}
+
+QScrollArea#herramientas_scroll > QWidget > QWidget {
+    background: transparent;
+}
 """
