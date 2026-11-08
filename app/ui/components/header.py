@@ -22,10 +22,10 @@ class Header(QFrame):
         informacion.addWidget(titulo)
         informacion.addWidget(descripcion)
 
-        estado = QLabel("●  Sistema local")
-        estado.setObjectName("estado")
+        self.estado = QLabel("")
+        self.estado.setObjectName("estado")
 
         principal.addLayout(informacion)
         principal.addStretch()
-        principal.addWidget(estado)
         
+        principal.addWidget(self.estado)

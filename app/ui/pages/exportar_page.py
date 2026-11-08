@@ -175,7 +175,7 @@ class ExportarPage(QWidget):
 
         # Detectamos el PDF generado por el servicio.
         # Si el servicio usa otro nombre, ajustamos esta ruta.
-        ruta_pdf = carpeta / "contactos.pdf"
+        ruta_pdf = carpeta / "reporte_contactos.pdf"
 
         if ruta_pdf.is_file():
             self.ruta_pdf = ruta_pdf
