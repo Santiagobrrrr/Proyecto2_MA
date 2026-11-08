@@ -1,59 +1,98 @@
 # Agenda de Contactos con Acceso Aleatorio
 
+**Laboratorio No. 2 · Manejo e Implementación de Archivos**  
+**Universidad Rafael Landívar · Ingeniería en Informática y Sistemas**  
+**Lenguaje:** Python · **Interfaz:** PySide6
+
 ## Descripción
 
-Aplicación de escritorio desarrollada en Python para administrar contactos mediante archivos de registros de longitud fija, acceso aleatorio e indexación primaria.
+**Agenda de Contactos** es una aplicación de escritorio que permite guardar, buscar y modificar contactos de forma sencilla. Cada contacto tiene un ID, nombre, teléfono, correo y ciudad.
 
-El proyecto corresponde al Laboratorio 2 del curso Manejo e Implementación de Archivos de la Universidad Rafael Landívar.
+El proyecto se realizó para poner en práctica el manejo de archivos con **registros de tamaño fijo**. También utiliza un **índice en JSON** para localizar contactos directamente en el archivo, sin tener que revisarlo completo cada vez que se hace una búsqueda.
 
-## Objetivo
+## ¿Qué permite hacer?
 
-Implementar una agenda de contactos que permita almacenar, buscar y modificar información sin necesidad de recorrer todo el archivo, utilizando técnicas de acceso aleatorio.
+- **Contactos:** agregar nuevos contactos, buscarlos por ID y modificar su información.
+- **Exportar:** generar un archivo JSON con los contactos y crear un reporte PDF a partir de esos datos.
+- **Herramientas:** comprobar la integridad del archivo con SHA-256, crear respaldos ZIP y consultar su tamaño, fecha de modificación y permisos.
+- **Ayuda:** consultar una guía básica para utilizar la aplicación.
 
-## Tecnologías
+## ¿Cómo se guardan los contactos?
 
-- Python
-- PySide6
-- fpdf2
-- JSON
-- SHA-256
-- ZIP
+La información se almacena en `datos/contactos.dat`. Todos los registros ocupan **168 bytes**, distribuidos de esta manera:
 
-## Funcionalidades previstas
+| Campo | Tamaño |
+| --- | ---: |
+| ID | 7 bytes |
+| Nombre | 48 bytes |
+| Teléfono | 16 bytes |
+| Correo | 64 bytes |
+| Ciudad | 32 bytes |
+| Salto de línea | 1 byte |
+| **Total** | **168 bytes** |
 
-- Agregar, buscar y modificar contactos.
-- Almacenar registros de tamaño fijo.
-- Realizar búsquedas mediante un índice primario.
-- Exportar contactos a JSON y PDF.
-- Verificar la integridad mediante SHA-256.
-- Generar respaldos comprimidos.
-- Consultar metadatos y permisos del archivo.
+Los campos se guardan en UTF-8 y se completan con espacios hasta alcanzar el tamaño establecido.
 
-## Estructura
+El archivo `datos/indice.json` relaciona cada **ID** con su **número de registro**. Con ese dato, el programa calcula la posición correspondiente y utiliza `seek()` para ir directamente al contacto; `tell()` permite conocer la posición actual dentro del archivo. Al modificar un contacto, se sobrescribe únicamente su registro.
 
-- `app/core/`: manejo de registros e índices.
-- `app/services/`: exportación, integridad y respaldos.
-- `app/ui/`: interfaz gráfica.
-- `datos/`: archivos de almacenamiento.
-- `exportaciones/`: reportes generados.
-- `respaldos/`: copias de seguridad.
-- `docs/`: documentación y evidencias.
-- `tests/`: pruebas.
+Después de guardar cambios, se actualiza el hash SHA-256. Al iniciar la aplicación, este valor se comprueba para detectar posibles modificaciones externas del archivo.
 
-## Instalación y ejecución
+## Organización del proyecto
 
-Crear un entorno virtual e instalar las dependencias:
-
-```bash
-python -m pip install -r requirements.txt
+```text
+Proyecto2_MA/
+├── app/
+│   ├── core/              # Registros, índice y acceso aleatorio
+│   ├── services/          # Exportaciones, integridad y respaldos
+│   └── ui/                # Ventanas y componentes de la interfaz
+├── datos/                 # Archivo de contactos, índice y hash
+├── exportaciones/         # JSON y reporte PDF generados
+├── respaldos/             # Copias comprimidas en ZIP
+├── docs/capturas/         # Evidencias para la documentación
+├── tests/                 # Scripts de prueba
+├── main.py                # Inicio de la aplicación
+└── requirements.txt       # Dependencias
 ```
 
-Iniciar la aplicación:
+## Requisitos y ejecución
 
-```bash
-python main.py
-```
+Se necesita **Python 3** y las dependencias incluidas en `requirements.txt` (`PySide6` y `fpdf2`). Los siguientes comandos están pensados para **PowerShell en Windows**.
 
-## Estado del proyecto
+1. Clonar el repositorio y entrar a la carpeta del proyecto:
 
-En desarrollo. La primera etapa corresponde a la preparación de la estructura y el entorno de ejecución.
+   ```powershell
+   git clone https://github.com/Santiagobrrrr/Proyecto2_MA.git
+   cd Proyecto2_MA
+   ```
+
+2. Crear el entorno virtual:
+
+   ```powershell
+   python -m venv .venv
+   ```
+
+3. Instalar las dependencias:
+
+   ```powershell
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   ```
+
+4. Iniciar la aplicación:
+
+   ```powershell
+   .\.venv\Scripts\python.exe main.py
+   ```
+
+> **Nota:** ejecuta los comandos desde la carpeta principal del proyecto. Si la agenda está vacía, puedes empezar agregando un contacto desde la interfaz.
+
+## Archivos generados y pruebas
+
+La aplicación crea los archivos `contactos.dat`, `indice.json` y `contactos.sha256` dentro de `datos/`. Desde la sección **Exportar** se generan `contactos.json` y `reporte_contactos.pdf`; desde **Herramientas** se pueden crear los respaldos ZIP.
+
+Estos archivos se mantienen **localmente** y no se suben automáticamente a GitHub, ya que están excluidos mediante `.gitignore`. Para la entrega del laboratorio se preparan por separado junto con el manual técnico y las capturas.
+
+La carpeta `tests/` incluye pruebas de las operaciones principales. **Antes de ejecutar scripts de prueba, se recomienda respaldar los datos**, porque algunos trabajan sobre los archivos de la agenda.
+
+---
+
+Proyecto desarrollado como parte del **Laboratorio No. 2 de Manejo e Implementación de Archivos**. El avance del trabajo puede consultarse en el [historial de commits](https://github.com/Santiagobrrrr/Proyecto2_MA/commits/main).
