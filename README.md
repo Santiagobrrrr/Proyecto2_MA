@@ -101,7 +101,7 @@ Estos archivos se mantienen en la computadora y están excluidos del repositorio
 
 ## Documentación
 
-- **[Manual técnico del proyecto](./Manual_T%C3%A9cnico.pdf.pdf)** — explica la estructura de los registros, el acceso aleatorio, el índice y las demás funciones.
+- **[Manual técnico del proyecto](https://github.com/Santiagobrrrr/Proyecto2_MA/blob/main/Informe_T%C3%A9cnico_MA.pdf)** — explica la estructura de los registros, el acceso aleatorio, el índice y las demás funciones.
 - **Pruebas:** la carpeta `tests/` contiene scripts para comprobar las operaciones principales. Algunos trabajan con los datos locales, por lo que se recomienda hacer un respaldo antes de ejecutarlos.
 
 ---
