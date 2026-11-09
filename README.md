@@ -2,7 +2,7 @@
 
 # Agenda de Contactos
 
-**Laboratorio No. 2 · Manejo e Implementación de Archivos**  
+**Proyecto No. 2 · Manejo e Implementación de Archivos**  
 Universidad Rafael Landívar · Ingeniería en Informática y Sistemas
 
 `Python` · `PySide6` · `JSON` · `SHA-256` · `ZIP`
